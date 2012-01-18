@@ -1,55 +1,25 @@
 class Scamp
   module IRC
     class Channel
-      attr_reader :adapter, :message
+      attr_reader :adapter, :channel, :message
 
-      def initialize adapter, msg
+      def initialize adapter, connection, message
         @adapter = adapter
-        @message = msg
+        @connection = connection
+        @channel = message.channel
+        @message = message
       end
 
-      def say msg, *rooms
-        if rooms.empty?
-          message.room.speak msg
+      def say msg, *channels
+        if channels.empty?
+          @connection.message "PRIVMSG #{channel} :#{msg}"
         else
-          rooms.each do |room|
-            r = adapter.room(room)
-            r.speak msg
-          end
+          channels.each {|chan| @connection.message "PRIVMSG #{chan} :#{msg}"}
         end
       end
 
       def reply msg
-        message.room.speak "#{message.user.name}: #{msg}"
-      end
-
-      def paste text, *rooms
-        if rooms.empty?
-          message.room.paste text
-        else
-          rooms.each do |room|
-            r = adapter.room(room)
-            r.paste text
-          end
-        end
-      end
-
-      def play sound, *rooms
-        if rooms.empty?
-          message.room.play sound.to_s
-        else
-          rooms.each do |room|
-            r = adapter.room(room)
-            r.play sound.to_s
-          end
-        end
-
-      end
-
-      %w(crickets drama greatjob live nyan pushit rimshot secret tada tmyk trombone vuvuzela yeah).each do |sound|
-        define_method sound do
-          play sound
-        end
+        say "#{message.nick}: #{msg}"
       end
     end
   end

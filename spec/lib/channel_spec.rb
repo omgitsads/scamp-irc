@@ -1,5 +1,5 @@
 require 'spec_helper'
 
-describe Scamp::Campfire::Channel do
+describe Scamp::IRC::Channel do
   
 end

@@ -1,18 +1,23 @@
+require 'scamp/irc/connection'
+
 class Scamp
   module IRC
     class Adapter < Scamp::Adapter
       def connect!
-        rooms.each do |room|
-          room.listen do |message|
-            msg = Scamp::IRC::Message.new self, :body => message[:body],
-                                                :room => channel,
-                                                :user => message[:user],
-                                                :type => message[:type]
+        @connection ||= Scamp::IRC::Connection.connect(self, config)
+        @opts[:channels].each {|channel| @connection.message("JOIN ##{channel}")}
+      end
 
-            channel = Scamp::IRC::Channel.new self, msg
+      def dispatch event, message=nil
+        puts "#{event} - #{message.inspect}"
+        if message && event == :channel
+          msg = Scamp::IRC::Message.new self, :body    => message.message,
+                                              :channel => message.channel,
+                                              :user    => message.nick
 
-            push [channel, msg]
-          end
+          channel = Scamp::IRC::Channel.new self, @connection, message
+
+          push [channel, msg]
         end
       end
 
@@ -25,30 +30,40 @@ class Scamp
       end
 
       def user
-        connection.me
+        nick
       end
 
-      def room name_or_id
-        if name_or_id.is_a? Fixnum
-          connection.find_room_by_id name_or_id
-        else
-          connection.find_room_by_name name_or_id
-        end
+      def config
+        @config ||= Isaac::Config.new(server, port, ssl?, password, nick, realname, "scamp", :production, verbose)
       end
 
       private
-        def rooms
-          @opts[:rooms].map do |room|
-            if room.is_a? String
-              connection.find_room_by_name room
-            else
-              connection.find_room_by_id room
-            end
-          end
+        def server
+          @opts[:server] || "localhost"
         end
 
-        def connection
-          @connection ||= Tinder::Campfire.new @opts[:subdomain], :token => @opts[:api_key]
+        def port
+          @opts[:port] || 6667
+        end
+
+        def ssl?
+          @opts[:ssl] || false
+        end
+
+        def password
+          @opts[:password]
+        end
+
+        def nick
+          @opts[:nick]
+        end
+
+        def realname
+          @opts[:realname] || "Scamp Bot"
+        end
+
+        def verbose
+          @bot.verbose
         end
     end
   end

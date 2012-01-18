@@ -1,4 +1,4 @@
-require "tinder"
+require 'isaac/bot'
 
 require "scamp/adapter"
 

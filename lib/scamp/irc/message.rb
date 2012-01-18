@@ -27,9 +27,9 @@ class Scamp
           return true if condition.nil?
 
           if condition.is_a? Array
-            return condition.include?(room.name)
+            return condition.include?(channel)
           else
-            return room.name.downcase == condition.to_s.downcase
+            return channel.downcase == condition.to_s.downcase
           end
         end
 
@@ -37,15 +37,15 @@ class Scamp
           return true if condition.nil?
 
           if condition.is_a? Array
-            return (condition.include?(user.name))
+            return (condition.include?(user))
           else
-            return user.name.downcase == condition.to_s.downcase
+            return user.downcase == condition.to_s.downcase
           end
         end
 
         def ignore_message?
           if adapter.ignore_self?
-            return user.id == adapter.user.id
+            return user == adapter.user
           end
           return false
         end

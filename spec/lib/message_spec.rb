@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Scamp::IRC::Message do
   let(:adapter) { Scamp::IRC::Adapter.new stub }
-  let(:channel) { stub(:name => "nwrug") }
-  let(:user) { stub(:id => 1234, :name => "User") }
+  let(:channel) { "nwrug" }
+  let(:user) { "User" }
   let(:body) { "Hello" }
   let(:message) { Scamp::IRC::Message.new(adapter, :body => body, :channel => channel, :user => user) }
 
@@ -83,7 +83,7 @@ describe Scamp::IRC::Message do
 
       context "message from self" do
         before do
-          adapter.stub(:user).and_return(stub(:id => 1234, :name => "User"))
+          adapter.stub(:user).and_return("User")
         end
 
         it "is not valid" do
@@ -93,7 +93,7 @@ describe Scamp::IRC::Message do
 
       context "message from another user" do
         before do
-          adapter.stub(:user).and_return(stub(:id => 5678, :name => "Another User"))
+          adapter.stub(:user).and_return("Another User")
         end
 
         it "is valid" do
@@ -111,7 +111,7 @@ describe Scamp::IRC::Message do
       end
 
       describe "on channel name" do
-        context "with valid room" do
+        context "with valid channel" do
           it "is valid with a string" do
             message.valid?(:channel => "nwrug").should be_true
           end
@@ -121,21 +121,21 @@ describe Scamp::IRC::Message do
           end
 
           it "is valid with a string array" do
-            message.valid?(:channel => ["Room"]).should be_true
+            message.valid?(:channel => ["nwrug"]).should be_true
           end
 
-          it "is valid with a string array of multiple rooms" do
-            message.valid?(:channel => ["Room", "Another"]).should be_true
+          it "is valid with a string array of multiple channels" do
+            message.valid?(:channel => ["nwrug", "ruby"]).should be_true
           end
         end
 
-        context "with invalid room" do
+        context "with invalid channel" do
           it "is invalid with a string" do
-            message.valid?(:channel => "Another").should be_false
+            message.valid?(:channel => "ruby").should be_false
           end
 
           it "is invalid with an array of strings" do
-            message.valid?(:channel => ["Another", "One More"]).should be_false
+            message.valid?(:channel => ["ruby", "rubyonrails"]).should be_false
           end
         end
       end
@@ -145,36 +145,6 @@ describe Scamp::IRC::Message do
       context "on no user condition" do
         it "is valid" do
           message.should be_valid
-        end
-      end
-
-      context "on user id" do
-        context "with valid user" do
-          it "is valid with a fixnum" do
-            message.valid?(:user => 1234).should be_true
-          end
-
-          it "is valid with a fixnum array" do
-            message.valid?(:user => [1234]).should be_true
-          end
-
-          it "is valid with a fixnum array of multiple users" do
-            message.valid?(:user => [1234, 5678]).should be_true
-          end
-        end
-
-        context "with invalid user" do
-          it "is invalid with fixnum" do
-            message.valid?(:user => 5678).should be_false
-          end
-
-          it "is invalid with a fixnum array" do
-            message.valid?(:user => [5678]).should be_false
-          end
-
-          it "is invalid with a fixnum array of multiple users" do
-            message.valid?(:user => [5678, 9012]).should be_false
-          end
         end
       end
 

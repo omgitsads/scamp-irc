@@ -1,5 +1,5 @@
 require 'spec_helper'
 
-describe Scamp::Campfire::Adapter do
+describe Scamp::IRC::Adapter do
 
 end
