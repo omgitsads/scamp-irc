@@ -1,13 +1,13 @@
-# Scamp Campfire Adapter
+# Scamp IRC Adapter
 
-This is the campfire adapter for Scamp, the bot framework
+This is the IRC adapter for Scamp, the bot framework
 
 ## Installation
 
 Put this in your gemfile!
 
 ``` ruby
-  gem 'scamp-campfire'
+  gem 'scamp-irc'
 ```
 
 
